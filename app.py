@@ -160,7 +160,13 @@ def register():
             cursor.execute(sql, values)
             connection.commit()
 
-            return "Student registered successfully! You can now log in."
+            new_student_id = cursor.lastrowid
+
+            session["student_id"] = new_student_id
+            session["student_name"] = fullname
+            session["student_registration"] = registration
+
+            return redirect(url_for("student_dashboard"))
 
         except Exception as e:
             connection.rollback()
@@ -171,8 +177,6 @@ def register():
             connection.close()
 
     return render_template("register.html")
-
-
 
 
 
