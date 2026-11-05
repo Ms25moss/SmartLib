@@ -1,0 +1,525 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | SmartLib</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .student-layout {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f7fa;
+        }
+
+        .student-sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #10243a;
+            color: white;
+            padding: 25px 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 45px;
+            padding: 0 8px;
+        }
+
+        .student-brand .brand-logo {
+            width: 43px;
+            height: 43px;
+            background: #d4af67;
+            color: #10243a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+
+        .student-brand h2 {
+            margin: 0;
+            color: white;
+        }
+
+        .student-brand span {
+            font-size: 12px;
+            color: #c5cbd3;
+        }
+
+        .student-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .student-nav .nav-heading {
+            color: #d4af67;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin: 15px 10px 8px;
+        }
+
+        .student-nav a {
+            color: #e1e6ed;
+            text-decoration: none;
+            padding: 13px 12px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .student-nav a:hover,
+        .student-nav a.active {
+            background: #d4af67;
+            color: #10243a;
+        }
+
+        .student-sidebar-footer {
+            margin-top: auto;
+            padding: 20px 8px 5px;
+            color: #b9c2ce;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .student-main {
+            flex: 1;
+            min-width: 0;
+            padding: 30px;
+        }
+
+        .student-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .student-topbar h1 {
+            color: #10243a;
+            margin: 0 0 5px;
+        }
+
+        .student-topbar p {
+            color: #777;
+            margin: 0;
+        }
+
+        .student-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .student-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #d4af67;
+            color: #10243a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .student-profile strong {
+            display: block;
+            color: #10243a;
+        }
+
+        .student-profile span {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .student-welcome {
+            background: #10243a;
+            color: white;
+            padding: 32px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .student-welcome h2 {
+            color: white;
+            margin: 10px 0;
+        }
+
+        .student-welcome p {
+            color: #d3dae2;
+            margin: 0;
+        }
+
+        .student-welcome .welcome-label {
+            color: #d4af67;
+            font-size: 12px;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .student-welcome .welcome-icon {
+            font-size: 55px;
+        }
+
+        .student-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .student-stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .student-stat-card .stat-icon {
+            font-size: 25px;
+        }
+
+        .student-stat-card h3 {
+            color: #555;
+            font-size: 14px;
+            margin: 12px 0 8px;
+        }
+
+        .student-stat-card .stat-number {
+            color: #10243a;
+            font-size: 26px;
+            font-weight: bold;
+            margin: 0 0 8px;
+        }
+
+        .student-stat-card .status-label {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .student-services {
+            margin-top: 25px;
+        }
+
+        .student-services h2 {
+            color: #10243a;
+            margin-bottom: 18px;
+        }
+
+        .student-services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .student-service-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #10243a;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+
+        .student-service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        .student-service-card > span {
+            font-size: 30px;
+        }
+
+        .student-service-card h3 {
+            margin: 14px 0 8px;
+        }
+
+        .student-service-card p {
+            color: #777;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .student-footer {
+            margin-top: 45px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+        @media (max-width: 950px) {
+            .student-stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .student-layout {
+                flex-direction: column;
+            }
+
+            .student-sidebar {
+                width: auto;
+                min-width: 0;
+                padding: 18px;
+            }
+
+            .student-brand {
+                margin-bottom: 15px;
+            }
+
+            .student-nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .student-nav .nav-heading {
+                grid-column: 1 / -1;
+            }
+
+            .student-sidebar-footer {
+                margin-top: 15px;
+            }
+
+            .student-main {
+                padding: 18px;
+            }
+
+            .student-stats-grid,
+            .student-services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .student-welcome {
+                padding: 23px;
+            }
+
+            .student-welcome .welcome-icon {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="student-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="student-sidebar">
+
+        <div class="student-brand">
+            <div class="brand-logo">SL</div>
+            <div>
+                <h2>SmartLib</h2>
+                <span>Student Portal</span>
+            </div>
+        </div>
+
+        <nav class="student-nav">
+
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a href="{{ url_for('student_dashboard') }}" class="active">
+                📊 Dashboard
+            </a>
+
+            <a href="{{ url_for('books') }}">
+                🔍 Browse Books
+            </a>
+
+            <a href="/borrowing">
+                📖 My Borrowings
+            </a>
+
+            <a href="/reservations">
+                🔖 My Reservations
+            </a>
+
+            <a href="/digital-library">
+                💻 Digital Resources
+            </a>
+
+            <a href="{{ url_for('notifications') }}">
+                🔔 Notifications
+                {% if unread_count > 0 %}
+                    ({{ unread_count }})
+                {% endif %}
+            </a>
+
+            <p class="nav-heading">ACCOUNT</p>
+
+            <a href="{{ url_for('student_logout') }}">
+                ↩️ Sign Out
+            </a>
+
+        </nav>
+
+        <div class="student-sidebar-footer">
+            <span>SmartLib Management System</span>
+            <br>
+            <small>Student Library Portal</small>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="student-main">
+
+        <header class="student-topbar">
+
+            <div>
+                <h1>Student Dashboard</h1>
+                <p>Your personal university library portal.</p>
+            </div>
+
+            <div class="student-profile">
+
+                <div class="student-avatar">
+                    {{ session.get('student_name', 'S')[0]|upper }}
+                </div>
+
+                <div>
+                    <strong>{{ session.get('student_name', 'Student') }}</strong>
+                    <span>Student Account</span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- WELCOME SECTION -->
+        <section class="student-welcome">
+
+            <div>
+                <span class="welcome-label">STUDENT PORTAL</span>
+
+                <h2>
+                    Welcome, {{ session.get('student_name', 'Student') }}!
+                </h2>
+
+                <p>
+                    Your university library, available wherever you are.
+                </p>
+            </div>
+
+            <div class="welcome-icon">📚</div>
+
+        </section>
+
+
+        <!-- STATISTICS -->
+        <section class="student-stats-grid">
+
+            <div class="student-stat-card">
+                <span class="stat-icon">📚</span>
+                <h3>My Borrowed Books</h3>
+                <p class="stat-number">{{ borrowed_count }}</p>
+                <span class="status-label">Currently borrowed</span>
+            </div>
+
+            <div class="student-stat-card">
+                <span class="stat-icon">⏰</span>
+                <h3>Due Soon</h3>
+                <p class="stat-number">{{ due_soon_count }}</p>
+                <span class="status-label">Require attention</span>
+            </div>
+
+            <div class="student-stat-card">
+                <span class="stat-icon">🔖</span>
+                <h3>Reservations</h3>
+                <p class="stat-number">{{ reservation_count }}</p>
+                <span class="status-label">Reserved books</span>
+            </div>
+
+            <div class="student-stat-card">
+                <span class="stat-icon">💳</span>
+                <h3>Outstanding Fines</h3>
+              <p class="stat-number">
+    KES {{ "%.2f"|format(outstanding_fines|float) }}
+</p>
+                <span class="status-label">Fine balance</span>
+            </div>
+
+        </section>
+
+
+        <!-- LIBRARY SERVICES -->
+        <section class="student-services">
+
+            <h2>Library Services</h2>
+
+            <div class="student-services-grid">
+
+                <a href="{{ url_for('books') }}"
+                   class="student-service-card">
+                    <span>🔍</span>
+                    <h3>Search Books</h3>
+                    <p>Find books in the library catalogue.</p>
+                </a>
+
+                <a href="/borrowing"
+                   class="student-service-card">
+                    <span>📖</span>
+                    <h3>My Borrowed Books</h3>
+                    <p>View your borrowed books, due dates and return history.</p>
+                </a>
+
+                <a href="/reservations"
+                   class="student-service-card">
+                    <span>🔖</span>
+                    <h3>Reservations</h3>
+                    <p>Manage your reserved books and track reservation status.</p>
+                </a>
+
+                <a href="/digital-library"
+                   class="student-service-card">
+                    <span>💻</span>
+                    <h3>Digital Resources</h3>
+                    <p>Explore e-books, research papers, journals and study notes.</p>
+                </a>
+
+                <a href="{{ url_for('notifications') }}"
+                   class="student-service-card">
+                    <span>🔔</span>
+                    <h3>Notifications</h3>
+                    <p>View important library updates and reminders.</p>
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <footer class="student-footer">
+            © 2026 SmartLib Digital Library Management System.
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>

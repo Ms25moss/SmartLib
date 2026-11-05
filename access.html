@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartLib | User Access</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="welcome-container">
+
+        <div class="logo">SL</div>
+
+        <h1>Smart<span>Lib.</span></h1>
+
+        <p class="tagline">Welcome to your digital library</p>
+
+        <h2 style="margin-top: 40px;">Choose Your Portal</h2>
+
+        <p class="description">
+            Select how you would like to access SmartLib.
+        </p>
+
+        <div style="display: grid; gap: 18px; max-width: 400px; margin: auto;">
+
+            <a href="/student-login" class="portal-link">
+                🎓 Student Portal →
+            </a>
+
+            <a href="/librarian-login" class="portal-link">
+                📚 Librarian Portal →
+            </a>
+
+            <a href="/register" class="portal-link secondary-link">
+                ✚ New Student Registration
+            </a>
+
+        </div>
+
+        <p class="footer">
+            SmartLib Digital Library Management System
+        </p>
+
+    </div>
+
+</body>
+</html>

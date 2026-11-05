@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrowing Management | SmartLib</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="borrowing-container">
+
+    <header class="borrowing-header">
+        <div>
+            <h2>SmartLib</h2>
+            <p>Library Borrowing Management</p>
+        </div>
+
+        <a href="/student-dashboard">Back to Dashboard</a>
+    </header>
+
+    <section class="borrowing-welcome">
+        <div>
+            <p class="page-label">STUDENT LIBRARY SERVICES</p>
+            <h1>My Borrowing Records</h1>
+            <p>Monitor your borrowed books, return dates and borrowing status.</p>
+        </div>
+    </section>
+
+    <!-- BORROWING STATISTICS -->
+
+    {% set stats = namespace(current=0, returned=0, overdue=0) %}
+
+    {% for record in borrowings %}
+        {% if record.display_status == 'Borrowed' %}
+            {% set stats.current = stats.current + 1 %}
+        {% elif record.display_status == 'Returned' %}
+            {% set stats.returned = stats.returned + 1 %}
+        {% elif record.display_status == 'Overdue' %}
+            {% set stats.overdue = stats.overdue + 1 %}
+        {% endif %}
+    {% endfor %}
+
+    <section class="borrowing-stats">
+
+        <div class="borrowing-stat-card">
+            <span class="stat-icon">📚</span>
+            <h3>{{ stats.current }}</h3>
+            <p>Currently Borrowed</p>
+        </div>
+
+        <div class="borrowing-stat-card">
+            <span class="stat-icon">✓</span>
+            <h3>{{ stats.returned }}</h3>
+            <p>Books Returned</p>
+        </div>
+
+        <div class="borrowing-stat-card">
+            <span class="stat-icon">!</span>
+            <h3>{{ stats.overdue }}</h3>
+            <p>Overdue Books</p>
+        </div>
+
+    </section>
+
+    <!-- BORROWING RECORDS -->
+
+    <section class="borrowing-records">
+
+        <div class="records-heading">
+            <div>
+                <h2>Borrowing History</h2>
+                <p>View your current and previous borrowing activities.</p>
+            </div>
+        </div>
+
+        <div class="borrowing-table-wrapper">
+
+            <table class="borrowing-table">
+
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for record in borrowings %}
+
+                    <tr>
+                        <td>
+                            <strong>{{ record.title }}</strong>
+                            <br>
+                            <small>{{ record.author }}</small>
+                        </td>
+
+                        <td>
+                            {{ record.borrow_date.strftime('%d %b %Y') if record.borrow_date else '—' }}
+                        </td>
+
+                        <td>
+                            {{ record.due_date.strftime('%d %b %Y') if record.due_date else '—' }}
+                        </td>
+
+                        <td>
+                            {{ record.return_date.strftime('%d %b %Y') if record.return_date else '—' }}
+                        </td>
+
+                        <td>
+                            <span class="borrow-status {{ record.display_status|lower }}">
+                                {{ record.display_status }}
+                            </span>
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="5" style="text-align:center; padding:30px;">
+                            You do not have any borrowing records yet.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <footer class="borrowing-footer">
+        <p>SmartLib University Library Management System</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

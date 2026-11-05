@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reservations | SmartLib</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="reservation-container">
+
+    <header class="reservation-header">
+        <div>
+            <h2>SmartLib</h2>
+            <p>Library Reservation Management</p>
+        </div>
+
+        <a href="/student-dashboard">Back to Dashboard</a>
+    </header>
+
+    <section class="reservation-welcome">
+        <p class="page-label">STUDENT LIBRARY SERVICES</p>
+        <h1>My Book Reservations</h1>
+        <p>Reserve books, monitor reservation progress and manage your requests.</p>
+    </section>
+
+    <!-- RESERVATION STATISTICS -->
+
+    {% set stats = namespace(total=0, pending=0, ready=0) %}
+
+    {% for reservation in reservations %}
+
+        {% set stats.total = stats.total + 1 %}
+
+        {% if reservation.reservation_status == 'Pending' %}
+            {% set stats.pending = stats.pending + 1 %}
+        {% elif reservation.reservation_status == 'Ready for Collection' %}
+            {% set stats.ready = stats.ready + 1 %}
+        {% endif %}
+
+    {% endfor %}
+
+    <section class="reservation-stats">
+
+        <div class="reservation-stat-card">
+            <span>📚</span>
+            <h3>{{ stats.total }}</h3>
+            <p>Total Reservations</p>
+        </div>
+
+        <div class="reservation-stat-card">
+            <span>⏳</span>
+            <h3>{{ stats.pending }}</h3>
+            <p>Pending Requests</p>
+        </div>
+
+        <div class="reservation-stat-card">
+            <span>✓</span>
+            <h3>{{ stats.ready }}</h3>
+            <p>Ready for Collection</p>
+        </div>
+
+    </section>
+
+    <!-- RESERVATION RECORDS -->
+
+    <section class="reservation-records">
+
+        <div class="reservation-records-heading">
+            <div>
+                <h2>Reservation History</h2>
+                <p>Track the status of your reserved books.</p>
+            </div>
+        </div>
+
+        <div class="reservation-table-wrapper">
+
+            <table class="reservation-table">
+
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Reservation Date</th>
+                        <th>Collection Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for reservation in reservations %}
+
+                    <tr>
+
+                        <td>
+                            <strong>{{ reservation.title }}</strong>
+                            <br>
+                            <small>{{ reservation.author }}</small>
+                        </td>
+
+                        <td>
+                            {{ reservation.reservation_date.strftime('%d %b %Y') if reservation.reservation_date else '—' }}
+                        </td>
+
+                        <td>
+                            {{ reservation.collection_date.strftime('%d %b %Y') if reservation.collection_date else 'Not scheduled' }}
+                        </td>
+
+                        <td>
+                            <span class="reservation-status
+                                {% if reservation.reservation_status == 'Pending' %}
+                                    pending
+                                {% elif reservation.reservation_status == 'Ready for Collection' %}
+                                    ready
+                                {% elif reservation.reservation_status == 'Completed' %}
+                                    completed
+                                {% elif reservation.reservation_status == 'Cancelled' %}
+                                    cancelled
+                                {% endif %}">
+                                {{ reservation.reservation_status }}
+                            </span>
+                        </td>
+
+                        <td>
+
+                            {% if reservation.reservation_status == 'Pending' %}
+
+                            <form method="POST"
+                                  action="{{ url_for('cancel_student_reservation', reservation_id=reservation.reservation_id) }}"
+                                  onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+
+                                <button type="submit"
+                                        class="cancel-reservation">
+                                    Cancel
+                                </button>
+
+                            </form>
+
+                            {% else %}
+
+                                <span>—</span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="5"
+                            style="text-align:center; padding:30px;">
+                            You have not made any reservations yet.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <footer class="reservation-footer">
+        <p>SmartLib University Library Management System</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Login | SmartLib</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="welcome-container">
+
+    <div class="logo">SL</div>
+
+    <h1>Smart<span>Lib.</span></h1>
+
+    <p class="tagline">Library Administration Portal</p>
+
+    <h2 style="margin-top: 35px;">Librarian Login</h2>
+
+    <p class="description">
+        Sign in to manage university library operations.
+    </p>
+
+    <form action="{{ url_for('librarian_login') }}" method="POST"
+          style="max-width: 400px; margin: auto; text-align: left;">
+
+        <label for="staff_id">Staff ID</label>
+        <input type="text" id="staff_id" name="staff_id"
+               placeholder="Enter your staff ID" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="Enter your password" required>
+
+        <button type="submit" style="width: 100%; margin-top: 25px;">
+            Access Librarian Dashboard →
+        </button>
+
+    </form>
+
+    <p style="margin-top: 22px;">
+        <a href="/access" style="color: #009FCB;">
+            ← Back to User Portals
+        </a>
+    </p>
+
+    <p class="footer">
+        SmartLib Digital Library Management System
+    </p>
+
+</div>
+
+</body>
+</html>

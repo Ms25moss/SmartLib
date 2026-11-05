@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Announcements | SmartLib</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="catalogue-container">
+
+    <header class="catalogue-header">
+        <h2>SmartLib</h2>
+        <a href="/librarian-dashboard">Back to Dashboard</a>
+    </header>
+
+    <main class="book-details-page">
+
+        <div class="book-information">
+
+            <p class="page-label">LIBRARY COMMUNICATION</p>
+
+            <h1>Send an Announcement</h1>
+
+            <p>
+                Share important library updates with all registered students.
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <p class="flash-message">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
+
+            <form action="{{ url_for('librarian_announcements') }}" method="POST">
+
+                <label for="title">Announcement Title</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    maxlength="150"
+                    placeholder="Enter announcement title"
+                    required
+                >
+
+                <label for="message">Announcement Message</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="6"
+                    placeholder="Write your announcement here..."
+                    required
+                ></textarea>
+
+                <button type="submit" class="book-action">
+                    Send to All Students
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

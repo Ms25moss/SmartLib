@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reservations | SmartLib</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="manage-books-container">
+
+    <header class="manage-books-header">
+        <div>
+            <h1>SmartLib</h1>
+            <p>Librarian Management Portal</p>
+        </div>
+        <a href="/librarian-dashboard" class="back-dashboard">← Dashboard</a>
+    </header>
+
+    <main class="manage-books-main">
+
+        <div class="manage-books-title">
+            <div>
+                <h2>Reservation Management</h2>
+                <p>Manage student book reservations and collection requests.</p>
+            </div>
+
+            <button class="add-book-btn" onclick="openReservationModal()">
+                + New Reservation
+            </button>
+        </div>
+
+        <section class="book-summary reservation-summary">
+
+            <div class="book-summary-card">
+                <div class="reservation-icon total-res-icon">📚</div>
+                <h3>Total Reservations</h3>
+                <p>{{ total_reservations }}</p>
+            </div>
+
+            <div class="book-summary-card">
+                <div class="reservation-icon pending-res-icon">⏳</div>
+                <h3>Pending Requests</h3>
+                <p>{{ pending_reservations }}</p>
+            </div>
+
+            <div class="book-summary-card">
+                <div class="reservation-icon ready-res-icon">📦</div>
+                <h3>Ready for Collection</h3>
+                <p>{{ ready_reservations }}</p>
+            </div>
+
+            <div class="book-summary-card">
+                <div class="reservation-icon completed-res-icon">✓</div>
+                <h3>Completed</h3>
+                <p>{{ completed_reservations }}</p>
+            </div>
+
+        </section>
+
+        <section class="book-management-panel">
+
+            <div class="book-management-heading">
+                <h3>Reservation Register</h3>
+
+                <input
+                    type="text"
+                    id="reservationSearch"
+                    placeholder="Search student, book or registration number..."
+                    onkeyup="searchReservations()"
+                >
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="manage-book-table" id="reservationTable">
+
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Registration No.</th>
+                            <th>Book Title</th>
+                            <th>Reservation Date</th>
+                            <th>Collection Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for reservation in reservations %}
+
+                        <tr>
+                            <td>{{ reservation.student_name }}</td>
+                            <td>{{ reservation.registration_number }}</td>
+                            <td>{{ reservation.book_title }}</td>
+                            <td>{{ reservation.reservation_date }}</td>
+                            <td>{{ reservation.collection_date or "Not set" }}</td>
+
+                            <td>
+                                <span class="book-status {{ reservation.reservation_status|lower|replace(' ', '-') }}">
+                                    {{ reservation.reservation_status }}
+                                </span>
+                            </td>
+
+                            <td>
+
+                                {% if reservation.reservation_status == "Pending" %}
+
+                                <form action="{{ url_for('update_reservation_status', reservation_id=reservation.reservation_id) }}"
+                                      method="POST" style="display:inline;">
+
+                                    <input type="hidden" name="status" value="Ready for Collection">
+
+                                    <button type="submit" class="reservation-action-btn approve-btn">
+                                        Approve
+                                    </button>
+
+                                </form>
+
+                                <form action="{{ url_for('update_reservation_status', reservation_id=reservation.reservation_id) }}"
+                                      method="POST" style="display:inline;">
+
+                                    <input type="hidden" name="status" value="Cancelled">
+
+                                    <button type="submit" class="reservation-action-btn reject-btn">
+                                        Reject
+                                    </button>
+
+                                </form>
+
+                                {% elif reservation.reservation_status == "Ready for Collection" %}
+
+                                <form action="{{ url_for('collect_reservation', reservation_id=reservation.reservation_id) }}"
+                                      method="POST"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Confirm that the student has collected this book? A borrowing record will be created.');">
+
+                                    <button type="submit" class="reservation-action-btn complete-btn">
+                                        Collected
+                                    </button>
+
+                                </form>
+
+                                {% else %}
+
+                                <span>{{ reservation.reservation_status }}</span>
+
+                                {% endif %}
+
+                                <form action="{{ url_for('delete_reservation', reservation_id=reservation.reservation_id) }}"
+                                      method="POST"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Are you sure you want to permanently delete this reservation?');">
+
+                                    <button type="submit" class="reservation-action-btn reject-btn">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="7" style="text-align:center;">
+                                No reservations have been recorded yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- NEW RESERVATION MODAL -->
+
+<div class="book-modal" id="reservationModal">
+
+    <div class="book-modal-content">
+
+        <span class="close-modal" onclick="closeReservationModal()">&times;</span>
+
+        <h2>Register New Reservation</h2>
+
+        <p>Enter the student and book reservation details.</p>
+
+        <form action="{{ url_for('add_reservation') }}" method="POST">
+
+            <label>Student</label>
+
+            <select name="student_id" required>
+
+                <option value="">Select Student</option>
+
+                {% for student in students %}
+
+                <option value="{{ student.student_id }}">
+                    {{ student.full_name }} - {{ student.registration_number }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Book</label>
+
+            <select name="book_id" required>
+
+                <option value="">Select Book</option>
+
+                {% for book in books %}
+
+                <option value="{{ book.book_id }}">
+                    {{ book.title }} ({{ book.available_copies }} available)
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Reservation Date</label>
+
+            <input
+                type="date"
+                name="reservation_date"
+                id="reservationDate"
+                required
+            >
+
+            <label>Collection Date</label>
+
+            <input
+                type="date"
+                name="collection_date"
+                id="collectionDate"
+                required
+            >
+
+            <button type="submit" class="add-book-btn">
+                Save Reservation
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function openReservationModal() {
+    document.getElementById("reservationModal").style.display = "flex";
+}
+
+function closeReservationModal() {
+    document.getElementById("reservationModal").style.display = "none";
+}
+
+
+function searchReservations() {
+
+    const query = document.getElementById("reservationSearch")
+        .value.toLowerCase();
+
+    const rows = document.querySelectorAll("#reservationTable tbody tr");
+
+    rows.forEach(row => {
+
+        const text = row.textContent.toLowerCase();
+
+        row.style.display = text.includes(query) ? "" : "none";
+
+    });
+
+}
+
+
+document.getElementById("reservationDate").addEventListener("change", function() {
+
+    document.getElementById("collectionDate").min = this.value;
+
+});
+
+
+document.querySelector("#reservationModal form").addEventListener("submit", function(event) {
+
+    const reservationDate = document.getElementById("reservationDate").value;
+    const collectionDate = document.getElementById("collectionDate").value;
+
+    if (collectionDate < reservationDate) {
+
+        event.preventDefault();
+
+        alert("Collection date cannot be before the reservation date.");
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

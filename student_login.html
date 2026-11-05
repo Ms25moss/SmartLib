@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login | SmartLib</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="welcome-container">
+
+    <div class="logo">SL</div>
+
+    <h1>Smart<span>Lib.</span></h1>
+
+    <p class="tagline">Student Library Portal</p>
+
+    <h2 style="margin-top: 35px;">Student Login</h2>
+
+    <p class="description">
+        Sign in to access your university library account.
+    </p>
+
+    <form action="{{ url_for('student_login') }}" method="POST"
+          style="max-width: 400px; margin: auto; text-align: left;">
+
+        <label for="registration">Registration Number</label>
+        <input type="text" id="registration"
+               name="registration"
+               placeholder="Enter your registration number"
+               required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password"
+               name="password"
+               placeholder="Enter your password"
+               required>
+
+        <button type="submit"
+                style="width: 100%; margin-top: 25px;">
+            Login →
+        </button>
+
+    </form>
+
+    <p style="margin-top: 22px; color: #718096;">
+        Don't have an account?
+        <a href="/register" style="color: #009FCB;">
+            Register here
+        </a>
+    </p>
+
+    <p class="footer">
+        SmartLib Digital Library Management System
+    </p>
+
+</div>
+
+</body>
+</html>

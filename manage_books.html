@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Books | SmartLib</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="manage-books-container">
+
+    <header class="manage-books-header">
+        <div class="manage-brand">
+            <div class="brand-logo">SL</div>
+            <div>
+                <h2>SmartLib</h2>
+                <span>Library Administration</span>
+            </div>
+        </div>
+
+        <a href="/librarian-dashboard" class="back-dashboard">← Dashboard</a>
+    </header>
+
+    <main class="manage-books-main">
+
+        <section class="manage-books-title">
+            <div>
+                <span class="page-label">COLLECTION MANAGEMENT</span>
+                <h1>Manage Books</h1>
+                <p>Organise, monitor and maintain your library collection.</p>
+            </div>
+
+            <button class="add-book-button" onclick="openBookForm()">
+                + Add New Book
+            </button>
+        </section>
+
+        <section class="book-summary">
+
+            <div class="book-summary-card">
+                <span>📚</span>
+                <div>
+                    <p>Total Books</p>
+                   <h2 id="totalBooks">{{ total_books }}</h2>
+                </div>
+            </div>
+
+            <div class="book-summary-card">
+                <span>🟢</span>
+                <div>
+                    <p>Available</p>
+                    <h2 id="availableBooks">{{ available_books }}</h2>
+                </div>
+            </div>
+
+            <div class="book-summary-card">
+                <span>🟠</span>
+                <div>
+                    <p>Borrowed</p>
+                    <h2 id="borrowedBooks">{{ borrowed_books }}</h2>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="book-management-panel">
+
+            <div class="book-toolbar">
+                <div>
+                    <h2>Library Collection</h2>
+                    <p>View and manage registered books.</p>
+                </div>
+
+                <input
+                    type="text"
+                    id="manageBookSearch"
+                    placeholder="Search by title, author or category..."
+                    onkeyup="searchManagedBooks()"
+                >
+            </div>
+
+            <div class="book-table-wrapper">
+                <table class="manage-book-table">
+                    <thead>
+                        <tr>
+                            <th>Book Details</th>
+                            <th>Category</th>
+                            <th>ISBN</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="manageBookTable">
+
+    {% for book in books %}
+
+    <tr id="book-{{ book.book_id }}"
+        data-status="{{ 'Available' if book.available_copies > 0 else 'Borrowed' }}">
+
+        <td>
+            <strong>{{ book.title }}</strong>
+            <small>{{ book.author }}</small>
+        </td>
+
+        <td>{{ book.category }}</td>
+
+        <td>{{ book.isbn or 'N/A' }}</td>
+
+        <td>
+            {% if book.available_copies > 0 %}
+                <span class="book-status available">Available</span>
+            {% else %}
+                <span class="book-status borrowed">Borrowed</span>
+            {% endif %}
+        </td>
+
+        <td>
+            <button class="edit-book" onclick="editBook(this)">Edit</button>
+            <button class="delete-book" onclick="deleteBook(this)">Delete</button>
+        </td>
+
+    </tr>
+
+    {% else %}
+
+    <tr>
+        <td colspan="5" style="text-align:center; padding:30px;">
+            No books have been added to the library yet.
+        </td>
+    </tr>
+
+    {% endfor %}
+
+</tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <footer class="manage-books-footer">
+            © 2026 SmartLib University Library Management System.
+        </footer>
+
+    </main>
+</div>
+
+<!-- ADD / EDIT BOOK FORM -->
+
+<div class="book-modal" id="bookModal">
+
+    <div class="book-modal-content">
+
+        <div class="modal-heading">
+            <div>
+                <span class="page-label">BOOK INFORMATION</span>
+                <h2 id="modalTitle">Add New Book</h2>
+            </div>
+
+            <button class="close-modal" onclick="closeBookForm()">×</button>
+        </div>
+
+     <form id="bookForm" method="POST" action="{{ url_for('add_book') }}">
+    <input type="hidden" id="bookID" name="book_id">
+
+            <input type="hidden" id="editingRow">
+
+            <label>Book Title</label>
+          <input type="text" id="bookTitle" name="title" required>
+
+            <label>Author</label>
+            <input type="text" id="bookAuthor" name="author" required>
+
+            <label>Category</label>
+           <select id="bookCategory" name="category" required>
+                <option value="">Select Category</option>
+                <option>Information Technology</option>
+                <option>Computer Science</option>
+                <option>Information Science</option>
+                <option>Management</option>
+                <option>Business</option>
+                <option>Education</option>
+                <option>Literature</option>
+                <option>Other</option>
+            </select>
+
+            <label>ISBN</label>
+          <input type="text" id="bookISBN" name="isbn" required>
+
+            <label>Book Status</label>
+           <select id="bookStatus" name="status" required>
+                <option>Available</option>
+                <option>Borrowed</option>
+            </select>
+
+            <div class="modal-actions">
+                <button type="button" class="cancel-modal" onclick="closeBookForm()">Cancel</button>
+                <button type="submit" class="save-book">Save Book</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+function openBookForm() {
+    document.getElementById("bookForm").reset();
+    document.getElementById("editingRow").value = "";
+    document.getElementById("modalTitle").textContent = "Add New Book";
+    document.getElementById("bookModal").style.display = "flex";
+}
+
+function closeBookForm() {
+    document.getElementById("bookModal").style.display = "none";
+}
+
+function updateBookStatistics() {
+    const rows = document.querySelectorAll("#manageBookTable tr");
+
+    let available = 0;
+    let borrowed = 0;
+
+    rows.forEach(row => {
+        if (row.dataset.status === "Available") available++;
+        if (row.dataset.status === "Borrowed") borrowed++;
+    });
+
+    document.getElementById("totalBooks").textContent = rows.length;
+    document.getElementById("availableBooks").textContent = available;
+    document.getElementById("borrowedBooks").textContent = borrowed;
+}
+
+
+function escapeHTML(value) {
+    return value.replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+function editBook(button) {
+    const row = button.closest("tr");
+    const cells = row.querySelectorAll("td");
+
+    document.getElementById("bookTitle").value =
+        cells[0].querySelector("strong").textContent;
+
+    document.getElementById("bookAuthor").value =
+        cells[0].querySelector("small").textContent;
+
+    document.getElementById("bookCategory").value =
+        cells[1].textContent;
+
+    document.getElementById("bookISBN").value =
+        cells[2].textContent;
+
+    document.getElementById("bookStatus").value =
+        row.dataset.status;
+
+    document.getElementById("bookID").value =
+        row.id.replace("book-", "");
+
+    document.getElementById("bookForm").action =
+        "{{ url_for('update_book') }}";
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Book Details";
+
+    document.getElementById("bookModal").style.display = "flex";
+}
+
+function deleteBook(button) {
+    const row = button.closest("tr");
+    const bookId = row.id.replace("book-", "");
+
+    if (confirm("Are you sure you want to delete this book?")) {
+
+        const form = document.createElement("form");
+
+        form.method = "POST";
+        form.action = `/delete-book/${bookId}`;
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function searchManagedBooks() {
+    const search = document.getElementById("manageBookSearch").value.toLowerCase();
+    const rows = document.querySelectorAll("#manageBookTable tr");
+
+    rows.forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(search) ? "" : "none";
+    });
+}
+
+updateBookStatistics();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Borrowing Records | SmartLib</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="manage-books-container">
+
+    <header class="manage-books-header">
+        <div>
+            <h1>SmartLib</h1>
+            <p>Librarian Management Portal</p>
+        </div>
+        <a href="/librarian-dashboard" class="back-dashboard">← Dashboard</a>
+    </header>
+
+    <main class="manage-books-main">
+
+        <div class="manage-books-title">
+            <div>
+                <h2>Borrowing Records</h2>
+                <p>Manage book loans, due dates and returns.</p>
+            </div>
+            <button class="add-book-btn" onclick="openBorrowModal()">
+                + New Borrowing
+            </button>
+        </div>
+
+        <section class="book-summary">
+            <div class="book-summary-card">
+                <h3>Total Records</h3>
+                <p id="totalCount">0</p>
+            </div>
+            <div class="book-summary-card">
+                <h3>Currently Borrowed</h3>
+                <p id="borrowedCount">0</p>
+            </div>
+            <div class="book-summary-card">
+                <h3>Overdue</h3>
+                <p id="overdueCount">0</p>
+            </div>
+            <div class="book-summary-card">
+                <h3>Returned</h3>
+                <p id="returnedCount">0</p>
+            </div>
+        </section>
+
+        <section class="book-management-panel">
+            <div class="book-management-heading">
+                <h3>Library Loan Register</h3>
+                <input
+                    type="text"
+                    id="borrowingSearch"
+                    placeholder="Search student, book or registration number..."
+                    onkeyup="searchBorrowings()"
+                >
+            </div>
+
+            <div class="table-responsive">
+                <table class="manage-book-table" id="borrowingTable">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Registration No.</th>
+                            <th>Book Title</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowingTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- NEW BORROWING MODAL -->
+<div class="book-modal" id="borrowingModal">
+    <div class="book-modal-content">
+        <span class="close-modal" onclick="closeBorrowModal()">&times;</span>
+
+        <h2>Register New Borrowing</h2>
+        <p>Enter the student and book loan details.</p>
+
+        <form id="borrowingForm">
+            <label>Student Full Name</label>
+            <input type="text" id="studentName" required>
+
+            <label>Registration Number</label>
+            <input type="text" id="registrationNumber" required>
+
+            <label>Book Title</label>
+            <input type="text" id="bookTitle" required>
+
+            <label>Borrow Date</label>
+            <input type="date" id="borrowDate" required>
+
+            <label>Due Date</label>
+            <input type="date" id="dueDate" required>
+
+            <button type="submit" class="add-book-btn">
+                Save Borrowing Record
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+let borrowingRecords = [
+    {
+        student: "Jane Wanjiku",
+        registration: "LIB/2024/001",
+        book: "Database Systems",
+        borrowDate: "2026-10-20",
+        dueDate: "2026-11-03",
+        returnDate: "",
+        status: "Borrowed"
+    },
+    {
+        student: "Brian Mwangi",
+        registration: "LIB/2024/002",
+        book: "Introduction to Algorithms",
+        borrowDate: "2026-10-10",
+        dueDate: "2026-10-24",
+        returnDate: "",
+        status: "Overdue"
+    },
+    {
+        student: "Mary Atieno",
+        registration: "LIB/2023/014",
+        book: "Information Management",
+        borrowDate: "2026-10-05",
+        dueDate: "2026-10-19",
+        returnDate: "2026-10-17",
+        status: "Returned"
+    },
+    {
+        student: "Kevin Otieno",
+        registration: "LIB/2024/019",
+        book: "Management Information Systems",
+        borrowDate: "2026-10-28",
+        dueDate: "2026-11-11",
+        returnDate: "",
+        status: "Borrowed"
+    }
+];
+
+function getStatus(record) {
+    if (record.returnDate) return "Returned";
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const due = new Date(record.dueDate + "T00:00:00");
+
+    if (due < today) return "Overdue";
+    return "Borrowed";
+}
+
+function renderBorrowings(records = borrowingRecords) {
+    const tbody = document.getElementById("borrowingTableBody");
+    tbody.innerHTML = "";
+
+    records.forEach((record) => {
+        const status = getStatus(record);
+
+        const row = document.createElement("tr");
+
+        const values = [
+            record.student,
+            record.registration,
+            record.book,
+            record.borrowDate,
+            record.dueDate,
+            record.returnDate || "—"
+        ];
+
+        values.forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = "book-status " + status.toLowerCase();
+        badge.textContent = status;
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+
+        const actionCell = document.createElement("td");
+
+        if (status !== "Returned") {
+            const button = document.createElement("button");
+            button.className = "return-book-btn";
+            button.textContent = "Mark Returned";
+            button.onclick = () => markReturned(record);
+            actionCell.appendChild(button);
+        } else {
+            actionCell.textContent = "Completed";
+        }
+
+        row.appendChild(actionCell);
+        tbody.appendChild(row);
+    });
+
+    updateBorrowingCounts();
+}
+
+function updateBorrowingCounts() {
+    const statuses = borrowingRecords.map(getStatus);
+
+    document.getElementById("totalCount").textContent =
+        borrowingRecords.length;
+
+    document.getElementById("borrowedCount").textContent =
+        statuses.filter(status => status === "Borrowed").length;
+
+    document.getElementById("overdueCount").textContent =
+        statuses.filter(status => status === "Overdue").length;
+
+    document.getElementById("returnedCount").textContent =
+        statuses.filter(status => status === "Returned").length;
+}
+
+function searchBorrowings() {
+    const query = document.getElementById("borrowingSearch")
+        .value.toLowerCase();
+
+    const filtered = borrowingRecords.filter(record =>
+        record.student.toLowerCase().includes(query) ||
+        record.registration.toLowerCase().includes(query) ||
+        record.book.toLowerCase().includes(query)
+    );
+
+    renderBorrowings(filtered);
+}
+
+function markReturned(record) {
+    record.returnDate = new Date().toISOString().split("T")[0];
+    renderBorrowings();
+    searchBorrowings();
+}
+
+function openBorrowModal() {
+    document.getElementById("borrowingModal").style.display = "flex";
+}
+
+function closeBorrowModal() {
+    document.getElementById("borrowingModal").style.display = "none";
+}
+
+document.getElementById("borrowingForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const borrowDate = document.getElementById("borrowDate").value;
+    const dueDate = document.getElementById("dueDate").value;
+
+    if (dueDate <= borrowDate) {
+        alert("The due date must be after the borrow date.");
+        return;
+    }
+
+    borrowingRecords.push({
+        student: document.getElementById("studentName").value.trim(),
+        registration: document.getElementById("registrationNumber").value.trim(),
+        book: document.getElementById("bookTitle").value.trim(),
+        borrowDate: borrowDate,
+        dueDate: dueDate,
+        returnDate: "",
+        status: "Borrowed"
+    });
+
+    this.reset();
+    closeBorrowModal();
+    renderBorrowings();
+    alert("Borrowing record added successfully!");
+});
+
+renderBorrowings();
+</script>
+
+</body>
+</html>
+

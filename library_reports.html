@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Reports | SmartLib</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body class="library-reports-page">
+
+<div class="reports-container">
+
+    <header class="reports-header">
+        <div>
+            <h1>Library Reports</h1>
+            <p>Monitor library performance and activities</p>
+        </div>
+
+        <a href="/librarian-dashboard" class="reports-back">
+            ← Back to Dashboard
+        </a>
+    </header>
+
+    <section class="reports-welcome">
+        <div>
+            <h2>General Library Report</h2>
+            <p>A complete overview of library operations, borrowing activities and digital resources.</p>
+        </div>
+        <div class="reports-icon">📊</div>
+    </section>
+
+    <section class="reports-controls">
+
+        <div>
+            <label for="reportPeriod">Reporting Period</label>
+
+            <select id="reportPeriod" onchange="changePeriod()">
+                <option value="monthly">Monthly Report</option>
+                <option value="weekly">Weekly Report</option>
+                <option value="yearly">Annual Report</option>
+            </select>
+        </div>
+
+        <div class="reports-action-buttons">
+
+            <button onclick="window.print()" class="reports-print">
+                🖨 Print Report
+            </button>
+
+            <button onclick="downloadPDF()" class="reports-pdf">
+                📥 Download PDF
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <h2 class="reports-section-title">Library Overview</h2>
+
+    <section class="reports-stat-grid">
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">📚</div>
+            <p>Total Book Copies</p>
+            <h3>{{ total_books }}</h3>
+            <span>Entire library collection</span>
+        </div>
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">👥</div>
+            <p>Registered Students</p>
+            <h3>{{ total_students }}</h3>
+            <span>Library members</span>
+        </div>
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">📖</div>
+            <p>Books Currently Borrowed</p>
+            <h3>{{ total_borrowed }}</h3>
+            <span>Unreturned borrowing records</span>
+        </div>
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">✓</div>
+            <p>Available Book Copies</p>
+            <h3>{{ total_available }}</h3>
+            <span>Ready for borrowing</span>
+        </div>
+
+    </section>
+
+
+    <h2 class="reports-section-title">Borrowing Statistics</h2>
+
+    <section class="reports-stat-grid">
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">↗</div>
+            <p>Books Issued</p>
+            <h3 id="booksIssued">{{ books_issued }}</h3>
+            <span>During selected period</span>
+        </div>
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">↩</div>
+            <p>Books Returned</p>
+            <h3 id="booksReturned">{{ books_returned }}</h3>
+            <span>Completed returns</span>
+        </div>
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">⏰</div>
+            <p>Overdue Books</p>
+            <h3>{{ overdue_books }}</h3>
+            <span>Awaiting return</span>
+        </div>
+
+        <div class="reports-stat-card">
+            <div class="reports-stat-icon">📅</div>
+            <p>Reservations</p>
+            <h3>{{ total_reservations }}</h3>
+            <span>Recorded reservations</span>
+        </div>
+
+    </section>
+
+
+    <section class="reports-bottom-grid">
+
+        <div class="reports-panel">
+
+            <h2>Library Activities</h2>
+            <p class="reports-subtitle">Overview of borrowing and returns</p>
+
+            <div class="reports-chart">
+
+                <div class="reports-chart-row">
+                    <span>Books Issued</span>
+
+                    <div class="reports-bar-bg">
+                        <div class="reports-bar issued-bar"
+                             style="width: {{ issued_percentage }}%">
+                        </div>
+                    </div>
+
+                    <strong>{{ books_issued }}</strong>
+                </div>
+
+                <div class="reports-chart-row">
+                    <span>Books Returned</span>
+
+                    <div class="reports-bar-bg">
+                        <div class="reports-bar returned-bar"
+                             style="width: {{ returned_percentage }}%">
+                        </div>
+                    </div>
+
+                    <strong>{{ books_returned }}</strong>
+                </div>
+
+                <div class="reports-chart-row">
+                    <span>Overdue</span>
+
+                    <div class="reports-bar-bg">
+                        <div class="reports-bar overdue-bar"
+                             style="width: {{ overdue_percentage }}%">
+                        </div>
+                    </div>
+
+                    <strong>{{ overdue_books }}</strong>
+                </div>
+
+                <div class="reports-chart-row">
+                    <span>Reservations</span>
+
+                    <div class="reports-bar-bg">
+                        <div class="reports-bar reservation-bar"
+                             style="width: {{ reservation_percentage }}%">
+                        </div>
+                    </div>
+
+                    <strong>{{ total_reservations }}</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="reports-panel">
+
+            <h2>Digital Resources</h2>
+            <p class="reports-subtitle">Digital collection overview</p>
+
+            <div class="reports-resource">
+                <span>💻 E-books</span>
+                <strong>{{ ebook_count }}</strong>
+            </div>
+
+            <div class="reports-resource">
+                <span>📑 Journals</span>
+                <strong>{{ journal_count }}</strong>
+            </div>
+
+            <div class="reports-resource">
+                <span>📄 Research Papers</span>
+                <strong>{{ paper_count }}</strong>
+            </div>
+
+            <div class="reports-resource">
+                <span>📝 Study Notes</span>
+                <strong>{{ notes_count }}</strong>
+            </div>
+
+            <div class="reports-resource-total">
+                Total Digital Resources
+                <strong>{{ total_digital_resources }}</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- REPORT CHARTS -->
+
+    <section class="reports-charts-section">
+
+        <h2 class="reports-section-title">Library Performance Analytics</h2>
+
+        <div class="reports-charts-grid">
+
+            <div class="reports-chart-card">
+                <h3>Borrowing and Returns</h3>
+                <p>Comparison of library borrowing activities</p>
+
+                <div class="reports-canvas">
+                    <canvas id="borrowingChart"></canvas>
+                </div>
+            </div>
+
+
+            <div class="reports-chart-card">
+                <h3>Monthly Borrowing Trends</h3>
+                <p>Monthly comparison of books borrowed and returned</p>
+
+                <div class="reports-canvas">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+
+            <div class="reports-chart-card reports-doughnut-card">
+                <h3>Library Collection Distribution</h3>
+                <p>Distribution of available and borrowed book copies</p>
+
+                <div class="reports-canvas">
+                    <canvas id="collectionChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer class="reports-footer">
+        <p>SmartLib Library Management System</p>
+        <span>General Library Report</span>
+    </footer>
+
+</div>
+
+
+<script>
+
+// REPORT DATA FROM MYSQL
+
+const reportData = {{ chart_data | tojson }};
+
+
+// BORROWING AND RETURNS CHART
+
+new Chart(document.getElementById("borrowingChart"), {
+
+    type: "bar",
+
+    data: {
+        labels: [
+            "Books Issued",
+            "Books Returned",
+            "Overdue",
+            "Reservations"
+        ],
+
+        datasets: [{
+            label: "Library Records",
+
+            data: [
+                reportData.books_issued,
+                reportData.books_returned,
+                reportData.overdue_books,
+                reportData.total_reservations
+            ],
+
+            backgroundColor: [
+                "#00BFEA",
+                "#27AE80",
+                "#EF795F",
+                "#8B79D9"
+            ],
+
+            borderRadius: 7,
+            barThickness: 35
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+
+});
+
+
+// MONTHLY BORROWING TRENDS
+
+new Chart(document.getElementById("monthlyChart"), {
+
+    type: "line",
+
+    data: {
+        labels: reportData.month_labels,
+
+        datasets: [
+
+            {
+                label: "Books Borrowed",
+                data: reportData.monthly_issued,
+                borderColor: "#00BFEA",
+                backgroundColor: "rgba(0,191,234,0.12)",
+                fill: true,
+                tension: 0.4
+            },
+
+            {
+                label: "Books Returned",
+                data: reportData.monthly_returned,
+                borderColor: "#27AE80",
+                backgroundColor: "rgba(39,174,128,0.08)",
+                fill: true,
+                tension: 0.4
+            }
+
+        ]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                position: "bottom"
+            }
+        },
+
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+
+});
+
+
+// BOOK COLLECTION DISTRIBUTION
+
+new Chart(document.getElementById("collectionChart"), {
+
+    type: "doughnut",
+
+    data: {
+        labels: [
+            "Available Books",
+            "Borrowed Books"
+        ],
+
+        datasets: [{
+            data: [
+                reportData.total_available,
+                reportData.total_borrowed
+            ],
+
+            backgroundColor: [
+                "#00BFEA",
+                "#8B79D9"
+            ],
+
+            borderWidth: 3,
+            borderColor: "#FFFFFF",
+            hoverOffset: 10
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "65%",
+
+        plugins: {
+            legend: {
+                position: "bottom"
+            }
+        }
+    }
+
+});
+
+
+// REPORT PERIOD
+
+function changePeriod() {
+
+    const period = document.getElementById("reportPeriod").value;
+
+    window.location.href =
+        "/library-reports?period=" + encodeURIComponent(period);
+
+}
+
+
+// DOWNLOAD REPORT AS PDF
+
+function downloadPDF() {
+
+    const report = document.querySelector(".reports-container");
+
+    const options = {
+
+        margin: 8,
+
+        filename: "SmartLib_General_Library_Report.pdf",
+
+        image: {
+            type: "jpeg",
+            quality: 0.98
+        },
+
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#F4F7FC"
+        },
+
+        jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait"
+        },
+
+        pagebreak: {
+            mode: ["avoid-all", "css", "legacy"]
+        }
+
+    };
+
+    html2pdf().set(options).from(report).save();
+
+}
+
+</script>
+
+</body>
+</html>

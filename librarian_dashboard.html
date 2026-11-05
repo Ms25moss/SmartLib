@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Dashboard | SmartLib</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="librarian-layout">
+
+    <aside class="librarian-sidebar">
+        <div class="librarian-brand">
+            <div class="brand-logo">SL</div>
+            <div>
+                <h2>SmartLib</h2>
+                <span>Librarian Portal</span>
+            </div>
+        </div>
+
+        <nav class="librarian-nav">
+            <p class="nav-heading">MAIN MENU</p>
+            <a href="/librarian-dashboard" class="active">📊 Dashboard</a>
+            <a href="#books">📚 Manage Books</a>
+            <a href="#students">👥 Students</a>
+            <a href="#borrowing">📖 Borrowing Records</a>
+            <a href="#reservations">🔖 Reservations</a>
+            <a href="#digital">💻 Digital Resources</a>
+            <a href="{{ url_for('manage_fines') }}">💰 Fines Management</a>
+            <a href="#reports">📈 Reports</a>
+
+            <p class="nav-heading">ACCOUNT</p>
+            <a href="{{ url_for('librarian_logout') }}">↩️ Sign Out</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>SmartLib Management System</span>
+            <small>Library Administration</small>
+        </div>
+    </aside>
+
+    <main class="librarian-main">
+
+        <header class="librarian-topbar">
+            <div>
+                <h1>Dashboard Overview</h1>
+                <p>Welcome to the SmartLib administration portal.</p>
+            </div>
+
+            <div class="librarian-profile">
+                <div class="profile-avatar">
+                    {{ session.get('librarian_name', 'L')[0]|upper }}
+                </div>
+                <div>
+                    <strong>{{ session.get('librarian_name', 'Librarian') }}</strong>
+                    <span>{{ session.get('librarian_role', 'Librarian') }}</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="librarian-welcome">
+            <div>
+                <span>LIBRARY MANAGEMENT</span>
+                <h2>Manage Your Library Efficiently</h2>
+                <p>Monitor collections, students, borrowing activities and digital resources from one place.</p>
+            </div>
+            <div class="welcome-icon">📚</div>
+        </section>
+
+        <section class="librarian-statistics">
+
+            <div class="librarian-stat-card">
+                <div class="stat-icon">📚</div>
+                <div>
+                    <p>Total Books</p>
+                    <h2>{{ "{:,}".format(total_books) }}</h2>
+                    <span>Library collection</span>
+                </div>
+            </div>
+
+            <div class="librarian-stat-card">
+                <div class="stat-icon">👥</div>
+                <div>
+                    <p>Registered Students</p>
+                    <h2>{{ "{:,}".format(total_students) }}</h2>
+                    <span>Library members</span>
+                </div>
+            </div>
+
+            <div class="librarian-stat-card">
+                <div class="stat-icon">📖</div>
+                <div>
+                    <p>Books Borrowed</p>
+                    <h2>{{ "{:,}".format(borrowed_books) }}</h2>
+                    <span>Currently on loan</span>
+                </div>
+            </div>
+
+            <div class="librarian-stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div>
+                    <p>Overdue Books</p>
+                    <h2>{{ "{:,}".format(overdue_books) }}</h2>
+                    <span>Require attention</span>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="librarian-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Library Operations</h2>
+                    <p>Access and manage the main library services.</p>
+                </div>
+            </div>
+
+            <div class="management-grid">
+
+                <a href="/manage-books" class="management-card">
+                    <span>📚</span>
+                    <h3>Manage Books</h3>
+                    <p>Add new books, update book information and manage availability.</p>
+                    <strong>Manage Collection →</strong>
+                </a>
+
+                <a href="/manage-students" class="management-card">
+                    <span>👥</span>
+                    <h3>Manage Students</h3>
+                    <p>View student records and manage library membership.</p>
+                    <strong>View Students →</strong>
+                </a>
+
+                <a href="/manage-borrowing" class="management-card">
+                    <span>📖</span>
+                    <h3>Borrowing Records</h3>
+                    <p>Monitor borrowed books, returns and overdue records.</p>
+                    <strong>Manage Borrowing →</strong>
+                </a>
+
+                <a href="/manage-reservations" class="management-card">
+                    <span>🔖</span>
+                    <h3>Reservations</h3>
+                    <p>Review and manage student book reservation requests.</p>
+                    <strong>View Reservations →</strong>
+                </a>
+
+                <a href="/manage-digital-resources" class="management-card">
+                    <span>💻</span>
+                    <h3>Digital Resources</h3>
+                    <p>Organise e-books, academic journals and research papers.</p>
+                    <strong>Manage Resources →</strong>
+                </a>
+
+                <a href="/librarian-announcements" class="management-card">
+                    <span>📢</span>
+                    <h3>Announcements</h3>
+                    <p>Send important library updates and announcements to all registered students.</p>
+                    <strong>Send Announcement →</strong>
+                </a>
+
+                <a href="{{ url_for('manage_fines') }}" class="management-card">
+                    <span>💰</span>
+                    <h3>Fines Management</h3>
+                    <p>View student fines, monitor unpaid amounts and manage payments.</p>
+                    <strong>Manage Fines →</strong>
+                </a>
+
+                <a href="/library-reports" class="management-card">
+                    <span>📈</span>
+                    <h3>Library Reports</h3>
+                    <p>Review borrowing statistics and library activity reports.</p>
+                    <strong>View Reports →</strong>
+                </a>
+
+            </div>
+        </section>
+
+        <footer class="librarian-footer">
+            © 2026 SmartLib University Library Management System.
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration | SmartLib</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="welcome-container">
+
+    <div class="logo">SL</div>
+
+    <h1>Smart<span>Lib.</span></h1>
+
+    <p class="tagline">Join Your University Digital Library</p>
+
+    <h2 style="margin-top: 30px;">Create Student Account</h2>
+
+    <p class="description">
+        Register to access books and digital library services.
+    </p>
+
+    <form action="{{ url_for('register') }}" method="POST"
+          style="max-width: 430px; margin: auto; text-align: left;">
+
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" name="fullname"
+               placeholder="Enter your full name" required>
+
+        <label for="registration">Registration Number</label>
+        <input type="text" id="registration" name="registration"
+               placeholder="Enter your university registration number"
+               required>
+        <label for="course">Course</label>
+<input type="text" id="course" name="course"
+       placeholder="Enter your course" required>
+
+        <label for="email">University Email</label>
+        <input type="email" id="email" name="email"
+               placeholder="Enter your email address" required>
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone"
+               placeholder="Enter your phone number" required>
+
+       <label for="password">Create Password</label>
+<input type="password" id="password" name="password"
+       placeholder="Create a password" minlength="8" required>
+
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password"
+               name="confirm_password"
+               placeholder="Confirm your password" required>
+
+        <button type="submit" style="width: 100%; margin-top: 25px;">
+            Create Account →
+        </button>
+
+    </form>
+
+    <p style="margin-top: 22px; color: #718096;">
+        Already registered?
+        <a href="/student-login" style="color: #009FCB;">
+            Login here
+        </a>
+    </p>
+
+    <p class="footer">
+        SmartLib Digital Library Management System
+    </p>
+
+</div>
+
+</body>
+</html>

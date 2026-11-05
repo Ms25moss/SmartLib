@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#10243a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartLib | Digital Library</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="welcome-container">
+
+        <div class="logo">SL</div>
+
+        <h1>Smart<span>Lib.</span></h1>
+
+        <p class="tagline">
+            Your knowledge. Your library. Your future.
+        </p>
+
+        <div class="book-icon">📚</div>
+
+        <h2>Discover a World of Knowledge</h2>
+
+        <p class="description">
+            Explore books, access digital resources and
+            manage your library experience in one place.
+        </p>
+
+        <button onclick="window.location.href='/access'">
+    Get Started →
+</button>
+
+        <p class="footer">
+            SmartLib Digital Library Management System
+        </p>
+
+    </div>
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+        navigator.serviceWorker.register(
+            "{{ url_for('static', filename='service-worker.js') }}"
+        );
+    });
+}
+</script>
+</body>
+</html>

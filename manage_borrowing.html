@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Borrowing Records | SmartLib</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="manage-books-container">
+
+    <header class="manage-books-header">
+        <div>
+            <h1>SmartLib</h1>
+            <p>Librarian Management Portal</p>
+        </div>
+        <a href="/librarian-dashboard" class="back-dashboard">← Dashboard</a>
+    </header>
+
+    <main class="manage-books-main">
+
+        <div class="manage-books-title">
+            <div>
+                <h2>Borrowing Records</h2>
+                <p>Manage book loans, due dates and returns.</p>
+            </div>
+
+            <button class="add-book-btn" onclick="openBorrowModal()">
+                + New Borrowing
+            </button>
+        </div>
+
+        <!-- BORROWING SUMMARY -->
+        <section class="book-summary borrowing-summary">
+
+            <div class="book-summary-card">
+                <div class="borrowing-icon total-icon">📚</div>
+                <h3>Total Records</h3>
+                <p>{{ total_records }}</p>
+            </div>
+
+            <div class="book-summary-card">
+                <div class="borrowing-icon borrowed-icon">📖</div>
+                <h3>Currently Borrowed</h3>
+                <p>{{ borrowed_count }}</p>
+            </div>
+
+            <div class="book-summary-card">
+                <div class="borrowing-icon overdue-icon">⏰</div>
+                <h3>Overdue</h3>
+                <p>{{ overdue_count }}</p>
+            </div>
+
+            <div class="book-summary-card">
+                <div class="borrowing-icon returned-icon">✓</div>
+                <h3>Returned</h3>
+                <p>{{ returned_count }}</p>
+            </div>
+
+        </section>
+
+        <!-- BORROWING TABLE -->
+        <section class="book-management-panel">
+
+            <div class="book-management-heading">
+                <h3>Library Loan Register</h3>
+
+                <input
+                    type="text"
+                    id="borrowingSearch"
+                    placeholder="Search student, book or registration number..."
+                    onkeyup="searchBorrowings()"
+                >
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="manage-book-table" id="borrowingTable">
+
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Registration No.</th>
+                            <th>Book Title</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="borrowingTableBody">
+
+                        {% for borrowing in borrowings %}
+
+                        <tr>
+                            <td>
+                                <strong>{{ borrowing.student_name }}</strong>
+                            </td>
+
+                            <td>{{ borrowing.registration_number }}</td>
+
+                            <td>{{ borrowing.book_title }}</td>
+
+                            <td>{{ borrowing.borrow_date }}</td>
+
+                            <td>{{ borrowing.due_date }}</td>
+
+                            <td>
+                                {{ borrowing.return_date or '—' }}
+                            </td>
+
+                            <td>
+                                {% if borrowing.current_status == 'Returned' %}
+                                    <span class="book-status returned">Returned</span>
+
+                                {% elif borrowing.current_status == 'Overdue' %}
+                                    <span class="book-status overdue">Overdue</span>
+
+                                {% else %}
+                                    <span class="book-status borrowed">Borrowed</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+
+                                {% if borrowing.current_status != 'Returned' %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('return_book', borrowing_id=borrowing.borrowing_id) }}"
+                                    onsubmit="return confirm('Mark this book as returned?');"
+                                    style="display:inline;"
+                                >
+                                    <button type="submit" class="return-book-btn">
+                                        Mark Returned
+                                    </button>
+                                </form>
+
+
+{% else %}
+
+<form
+    method="POST"
+    action="{{ url_for('undo_return', borrowing_id=borrowing.borrowing_id) }}"
+    onsubmit="return confirm('Undo this return? The borrowing record will become active again and available copies will decrease by one.');"
+    style="display:inline;"
+>
+    <button type="submit" class="reservation-action-btn reject-btn">
+        Undo Return
+    </button>
+</form>
+
+<form
+    method="POST"
+    action="{{ url_for('delete_borrowing', borrowing_id=borrowing.borrowing_id) }}"
+    onsubmit="return confirm('Permanently delete this returned test record?');"
+    style="display:inline;"
+>
+    <button type="submit" class="return-book-btn">
+        Delete
+    </button>
+</form>
+
+{% endif %}
+
+
+                            </td>
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="8" style="text-align:center; padding:30px;">
+                                No borrowing records found.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </section>
+
+    </main>
+</div>
+
+
+<!-- NEW BORROWING MODAL -->
+<div class="book-modal" id="borrowingModal">
+
+    <div class="book-modal-content">
+
+        <span class="close-modal" onclick="closeBorrowModal()">&times;</span>
+
+        <h2>Register New Borrowing</h2>
+        <p>Enter the student and book loan details.</p>
+
+        <form method="POST" action="{{ url_for('add_borrowing') }}">
+
+            <label>Student</label>
+
+            <select name="student_id" required>
+                <option value="">Select Student</option>
+
+                {% for student in students %}
+                <option value="{{ student.student_id }}">
+                    {{ student.full_name }} ({{ student.registration_number }})
+                </option>
+                {% endfor %}
+
+            </select>
+
+            <label>Book</label>
+
+            <select name="book_id" required>
+                <option value="">Select Book</option>
+
+                {% for book in books %}
+                    {% if book.available_copies > 0 %}
+                    <option value="{{ book.book_id }}">
+                        {{ book.title }} — {{ book.available_copies }} available
+                    </option>
+                    {% endif %}
+                {% endfor %}
+
+            </select>
+
+            <label>Borrow Date</label>
+            <input type="date" name="borrow_date" required>
+
+            <p style="color:#64748b; font-size:13px; margin:8px 0 15px;">
+                The due date will be calculated automatically, exactly 14 days after the borrowing date.
+            </p>
+
+            <button type="submit" class="add-book-btn">
+                Save Borrowing Record
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+
+function openBorrowModal() {
+    document.getElementById("borrowingModal").style.display = "flex";
+}
+
+function closeBorrowModal() {
+    document.getElementById("borrowingModal").style.display = "none";
+}
+
+
+function searchBorrowings() {
+
+    const query = document.getElementById("borrowingSearch")
+        .value.toLowerCase();
+
+    const rows = document.querySelectorAll(
+        "#borrowingTableBody tr"
+    );
+
+    rows.forEach(row => {
+
+        const text = row.textContent.toLowerCase();
+
+        row.style.display = text.includes(query) ? "" : "none";
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>

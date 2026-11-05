@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | SmartLib</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="notification-container">
+
+    <header class="notification-header">
+        <div>
+            <h2>SmartLib</h2>
+            <p>Library Notification Centre</p>
+        </div>
+
+        <a href="/student-dashboard">Back to Dashboard</a>
+    </header>
+
+    <section class="notification-welcome">
+        <p class="page-label">STUDENT LIBRARY SERVICES</p>
+        <h1>Notifications</h1>
+        <p>Stay informed about your books, deadlines and reservations.</p>
+    </section>
+
+    <!-- Notification Summary -->
+
+    <section class="notification-stats">
+
+        <div class="notification-stat-card">
+            <span>🔔</span>
+            <h3>{{ total_notifications }}</h3>
+            <p>Total Notifications</p>
+        </div>
+
+        <div class="notification-stat-card">
+            <span>📚</span>
+            <h3>{{ borrowing_notifications }}</h3>
+            <p>Book Reminders</p>
+        </div>
+
+        <div class="notification-stat-card">
+            <span>⚠️</span>
+            <h3>{{ overdue_notifications }}</h3>
+            <p>Overdue Alerts</p>
+        </div>
+
+    </section>
+
+    <!-- Notification List -->
+
+    <section class="notification-list-section">
+
+        <div class="notification-list-heading">
+            <h2>Recent Notifications</h2>
+
+            {% if total_notifications > 0 %}
+            <form action="{{ url_for('mark_all_notifications_read') }}"
+                  method="POST">
+
+                <button type="submit">Mark All as Read</button>
+
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="notification-list">
+
+            {% for notification in notifications %}
+
+                <div class="notification-item
+                    {% if notification.is_read %}read{% else %}unread{% endif %}
+                    {% if notification.notification_type == 'Overdue' %}overdue-notification
+                    {% elif notification.notification_type == 'Borrowing' %}reminder-notification
+                    {% elif notification.notification_type == 'Reservation' %}reservation-notification
+                    {% else %}general-notification{% endif %}">
+
+                    <div class="notification-icon">
+                        {% if notification.notification_type == 'Overdue' %}
+                            ⚠️
+                        {% elif notification.notification_type == 'Borrowing' %}
+                            📚
+                        {% elif notification.notification_type == 'Reservation' %}
+                            🔖
+                        {% else %}
+                            ✓
+                        {% endif %}
+                    </div>
+
+                    <div class="notification-content">
+
+                        <h3>{{ notification.notification_title }}</h3>
+
+                        <p>{{ notification.notification_message }}</p>
+
+                        <span>
+                            {{ notification.date_sent.strftime('%d %B %Y') }}
+                        </span>
+
+                    </div>
+
+                    {% if not notification.is_read %}
+                        <span class="notification-dot"></span>
+                    {% endif %}
+
+                </div>
+
+            {% else %}
+
+                <div class="notification-item">
+                    <div class="notification-icon">🔔</div>
+
+                    <div class="notification-content">
+                        <h3>No Notifications Yet</h3>
+                        <p>You currently have no library notifications.</p>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <footer class="notification-footer">
+        <p>SmartLib University Library Management System</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} | SmartLib</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="catalogue-container">
+
+    <header class="catalogue-header">
+        <h2>SmartLib</h2>
+        <a href="/books">Back to Catalogue</a>
+    </header>
+
+    <main class="book-details-page">
+
+        <div class="book-cover details-cover">
+            <span>SL</span>
+        </div>
+
+        <div class="book-information">
+
+            <p class="page-label">BOOK INFORMATION</p>
+
+            <h1>{{ book.title }}</h1>
+
+            <p class="book-author">
+                Author: {{ book.author }}
+            </p>
+
+            <div class="detail-row">
+                <strong>Category:</strong>
+                <span>{{ book.category }}</span>
+            </div>
+
+            <div class="detail-row">
+                <strong>ISBN:</strong>
+                <span>{{ book.isbn }}</span>
+            </div>
+
+            <div class="detail-row">
+                <strong>Availability:</strong>
+                <span class="book-status">{{ book.status }}</span>
+            </div>
+
+            <p class="book-description">
+                {{ book.description }}
+            </p>
+
+            {% if book.available_copies > 0 %}
+
+                <form action="{{ url_for('student_reserve_book', book_id=book.book_id) }}"
+                      method="POST">
+
+                    <label for="collection_date">
+                        Preferred Collection Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="collection_date"
+                        name="collection_date"
+                        required
+                    >
+
+                    <button type="submit" class="book-action">
+                        Reserve Book
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <p>This book is currently unavailable for reservation.</p>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

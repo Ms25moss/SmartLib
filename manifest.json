@@ -1,0 +1,11 @@
+{
+    "name": "SmartLib - Library Management",
+    "short_name": "SmartLib",
+    "description": "SmartLib University Library Management System",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#10243a"
+}

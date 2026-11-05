@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students | SmartLib</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="manage-books-container">
+
+    <header class="manage-books-header">
+        <div class="manage-brand">
+            <div class="brand-logo">SL</div>
+            <div>
+                <h2>SmartLib</h2>
+                <span>Library Administration</span>
+            </div>
+        </div>
+
+        <a href="/librarian-dashboard" class="back-dashboard">← Dashboard</a>
+    </header>
+
+    <main class="manage-books-main">
+
+        <section class="manage-books-title">
+            <div>
+                <span class="page-label">MEMBERSHIP MANAGEMENT</span>
+                <h1>Manage Students</h1>
+                <p>View, register and manage university library members.</p>
+            </div>
+
+            <button class="add-book-button" onclick="openStudentForm()">
+                + Register Student
+            </button>
+        </section>
+
+        <section class="book-summary">
+
+            <div class="book-summary-card">
+                <span>👥</span>
+                <div>
+                    <p>Total Students</p>
+                    <h2 id="totalStudents">{{ total_students }}</h2>
+                </div>
+            </div>
+
+            <div class="book-summary-card">
+                <span>🟢</span>
+                <div>
+                    <p>Active Members</p>
+                    <h2 id="activeStudents">{{ active_students }}</h2>
+                </div>
+            </div>
+
+            <div class="book-summary-card">
+                <span>🔴</span>
+                <div>
+                    <p>Inactive Members</p>
+                    <h2 id="inactiveStudents">{{ inactive_students }}</h2>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="book-management-panel">
+
+            <div class="book-toolbar">
+                <div>
+                    <h2>Registered Students</h2>
+                    <p>Manage student library membership records.</p>
+                </div>
+
+                <input
+                    type="text"
+                    id="studentSearch"
+                    placeholder="Search by name, registration number or email..."
+                    onkeyup="searchStudents()"
+                >
+            </div>
+
+            <div class="book-table-wrapper">
+
+                <table class="manage-book-table">
+                    <thead>
+                        <tr>
+                            <th>Student Details</th>
+                            <th>Registration Number</th>
+                            <th>Email Address</th>
+                            <th>Phone Number</th>
+                            <th>Membership</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentTable">
+
+                        {% for student in students %}
+
+                        <tr id="student-{{ student.student_id }}"
+                            data-status="{{ student.membership_status }}">
+
+                            <td>
+                                <strong>{{ student.full_name }}</strong>
+                                <small>{{ student.course }}</small>
+                            </td>
+
+                            <td>{{ student.registration_number }}</td>
+
+                            <td>{{ student.email }}</td>
+
+                            <td>{{ student.phone or 'N/A' }}</td>
+
+                            <td>
+                                {% if student.membership_status == 'Active' %}
+                                    <span class="book-status available">Active</span>
+                                {% else %}
+                                    <span class="book-status borrowed">Inactive</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <button class="edit-book" onclick="editStudent(this)">Edit</button>
+                                <button class="delete-book" onclick="deleteStudent(this)">Delete</button>
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:30px;">
+                                No students have registered yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+
+        <footer class="manage-books-footer">
+            © 2026 SmartLib University Library Management System.
+        </footer>
+
+    </main>
+</div>
+
+<!-- STUDENT REGISTRATION MODAL -->
+
+<div class="book-modal" id="studentModal">
+
+    <div class="book-modal-content">
+
+        <div class="modal-heading">
+            <div>
+                <span class="page-label">STUDENT INFORMATION</span>
+                <h2 id="studentModalTitle">Register Student</h2>
+            </div>
+
+            <button class="close-modal" onclick="closeStudentForm()">×</button>
+        </div>
+
+        <form id="studentForm" method="POST" action="{{ url_for('add_student') }}">
+
+            <input type="hidden" id="editingStudent" name="student_id">
+
+            <label>Full Name</label>
+            <input type="text" id="studentName" name="full_name" required>
+
+            <label>Registration Number</label>
+            <input type="text" id="studentReg" name="registration_number" required>
+
+            <label>Course / Programme</label>
+            <input type="text" id="studentCourse" name="course" required>
+
+            <label>Email Address</label>
+            <input type="email" id="studentEmail" name="email" required>
+
+            <label>Phone Number</label>
+            <input type="tel" id="studentPhone" name="phone" required>
+
+            <label>Membership Status</label>
+            <select id="studentStatus" name="membership_status" required>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+
+            <div class="modal-actions">
+                <button type="button" class="cancel-modal" onclick="closeStudentForm()">Cancel</button>
+                <button type="submit" class="save-book">Save Student</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+function openStudentForm() {
+    document.getElementById("studentForm").reset();
+
+    document.getElementById("editingStudent").value = "";
+
+    document.getElementById("studentForm").action =
+        "{{ url_for('add_student') }}";
+
+    document.getElementById("studentModalTitle").textContent =
+        "Register Student";
+
+    document.getElementById("studentModal").style.display = "flex";
+}
+
+function closeStudentForm() {
+    document.getElementById("studentModal").style.display = "none";
+}
+
+function editStudent(button) {
+    const row = button.closest("tr");
+    const cells = row.querySelectorAll("td");
+
+    const studentId = row.id.replace("student-", "");
+
+    document.getElementById("studentName").value =
+        cells[0].querySelector("strong").textContent;
+
+    document.getElementById("studentCourse").value =
+        cells[0].querySelector("small").textContent;
+
+    document.getElementById("studentReg").value =
+        cells[1].textContent.trim();
+
+    document.getElementById("studentEmail").value =
+        cells[2].textContent.trim();
+
+    document.getElementById("studentPhone").value =
+        cells[3].textContent.trim() === "N/A" ? "" : cells[3].textContent.trim();
+
+    document.getElementById("studentStatus").value =
+        row.dataset.status;
+
+    document.getElementById("editingStudent").value = studentId;
+
+    document.getElementById("studentForm").action =
+    "/update-student";
+
+    document.getElementById("studentModalTitle").textContent =
+        "Edit Student Details";
+
+    document.getElementById("studentModal").style.display = "flex";
+}
+
+function deleteStudent(button) {
+    const row = button.closest("tr");
+    const studentId = row.id.replace("student-", "");
+
+    if (confirm("Are you sure you want to remove this student?")) {
+
+        const form = document.createElement("form");
+
+        form.method = "POST";
+        form.action = `/delete-student/${studentId}`;
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function searchStudents() {
+    const search = document.getElementById("studentSearch").value.toLowerCase();
+    const rows = document.querySelectorAll("#studentTable tr");
+
+    rows.forEach(row => {
+        row.style.display =
+            row.textContent.toLowerCase().includes(search) ? "" : "none";
+    });
+}
+
+</script>
+
+</body>
+</html>
