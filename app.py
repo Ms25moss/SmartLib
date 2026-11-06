@@ -271,6 +271,7 @@ def student_dashboard():
         connection.close()
 
 
+
 # BOOKS PAGE
 @app.route("/books")
 def books():
@@ -286,11 +287,14 @@ def books():
     cursor = connection.cursor(dictionary=True)
 
     try:
-
         cursor.execute("""
-            SELECT *
+            SELECT
+                books.*,
+                digital_resources.resource_id AS digital_resource_id
             FROM books
-            ORDER BY title ASC
+            LEFT JOIN digital_resources
+                ON books.book_id = digital_resources.book_id
+            ORDER BY books.title ASC
         """)
 
         books = cursor.fetchall()
