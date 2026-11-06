@@ -254,6 +254,17 @@
     </main>
 
 </div>
+<script>
+    const sidebar = document.getElementById('librarianSidebar');
+    const overlay = document.getElementById('overlay');
 
+    function toggleMenu() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+    }
+
+    document.getElementById('menuBtn').addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+</script>
 </body>
 </html>
