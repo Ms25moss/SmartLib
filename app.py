@@ -350,6 +350,48 @@ def book_details(book_id):
     finally:
         cursor.close()
         connection.close()
+        
+
+# READ DIGITAL BOOK ONLINE
+@app.route("/read-online/<int:book_id>")
+def read_online(book_id):
+
+    if "student_id" not in session:
+        return redirect(url_for("student_login"))
+
+    connection = get_db_connection()
+
+    if connection is None:
+        return "Database connection failed."
+
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT
+                books.title,
+                digital_resources.resource_url
+            FROM books
+            INNER JOIN digital_resources
+                ON books.book_id = digital_resources.book_id
+            WHERE books.book_id = %s
+            AND digital_resources.file_format = 'PDF'
+            LIMIT 1
+        """, (book_id,))
+
+        resource = cursor.fetchone()
+
+        if resource is None or not resource["resource_url"]:
+            return "Digital resource not found.", 404
+
+        return render_template(
+            "read_online.html",
+            resource=resource
+        )
+
+    finally:
+        cursor.close()
+        connection.close()
 
 
 
