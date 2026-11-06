@@ -80,10 +80,20 @@
                         <span class="book-status borrowed">Borrowed</span>
                     {% endif %}
 
-                    <button class="book-action"
-                            onclick="window.location.href='/book-details/{{ book.book_id }}'">
-                        View Details
-                    </button>
+                   
+<button class="book-action"
+        onclick="window.location.href='/book-details/{{ book.book_id }}'">
+    View Details
+</button>
+
+{% if book.digital_resource_id %}
+    <button class="book-action"
+            style="background:#d4af67; color:#10243a; margin-top:10px;"
+            onclick="window.location.href='/read-online/{{ book.book_id }}'">
+        Read Online
+    </button>
+{% endif %}
+
 
                 </div>
             </div>
