@@ -6,6 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Librarian Dashboard | SmartLib</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <style>
+        .mobile-bar { display: none; }
+        .sidebar-overlay { display: none; }
+
+        @media (max-width: 768px) {
+            .mobile-bar {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: #d4af67;
+                color: #10243a;
+                font-weight: bold;
+                padding: 12px 16px;
+                position: sticky;
+                top: 0;
+                z-index: 900;
+            }
+
+            .mobile-bar button {
+                font-size: 26px;
+                background: none;
+                border: none;
+                color: #10243a;
+                cursor: pointer;
+            }
+
+            .librarian-layout {
+                flex-direction: column;
+            }
+
+            .librarian-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 260px;
+                min-width: 260px;
+                padding: 25px 18px;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                z-index: 1000;
+                overflow-y: auto;
+            }
+
+            .librarian-sidebar .librarian-nav {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .librarian-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 999;
+            }
+        }
+    </style>
 </head>
 
 <body>
