@@ -1,1 +1,113 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read Online | SmartLib</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #F4F7FC;
+            color: #10243a;
+        }
+
+        header {
+            background: #10243a;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header h2 {
+            color: #d4af67;
+        }
+
+        .back-link {
+            color: #e8c987;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .reader-heading {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .reader-heading h1 {
+            margin-bottom: 8px;
+        }
+
+        .pdf-viewer {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        iframe {
+            width: 100%;
+            height: 75vh;
+            min-height: 500px;
+            border: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 12px;
+            }
+
+            iframe {
+                height: 70vh;
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>SmartLib</h2>
+    <a class="back-link" href="{{ url_for('books') }}">
+        ← Back to Books
+    </a>
+</header>
+
+<div class="container">
+
+    <div class="reader-heading">
+        <h1>{{ resource.title }}</h1>
+        <p>Online Reading | PDF Document</p>
+    </div>
+
+    <div class="pdf-viewer">
+        <iframe
+            src="{{ resource.resource_url }}"
+            title="Read {{ resource.title }}">
+        </iframe>
+    </div>
+
+</div>
+
+</body>
+</html>
+
